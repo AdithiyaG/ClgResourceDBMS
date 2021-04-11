@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "mern": "concurrently -n 'server,client' -c 'green,blue' \"nodemon app.js\" \"cd Client && npm run start\""
   },
   "author": "",
   "license": "ISC",
