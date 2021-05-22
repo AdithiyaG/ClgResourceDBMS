@@ -20,7 +20,7 @@
           <% files.map((file)=> { %>
             <div class="card card-body mb-3">
                   <%= file.filename %>
-                      <form method="POST" action="/<%= collection %>/<%= file._id %>?_method=DELETE">
+                      <form method="POST" action="files/<%= collection %>/<%= file._id %>?_method=DELETE">
                         <button class="btn btn-danger btn-block mt-4">Delete</button>
                       </form>
             </div>

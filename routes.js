@@ -8,8 +8,10 @@ const router=express.Router();
 const path=require('path');
 
 
+
 //Mongo URI
 const mongoURI='mongodb+srv://admin:admin@clgfilesystem.wmbwk.mongodb.net/test?retryWrites=true&w=majority';
+
 
 //Mongo Connection
 mongoose.connect(mongoURI, {
@@ -20,6 +22,12 @@ useUnifiedTopology: true
       console.log("MongoDB Connected…");
 })
 .catch(err => console.log(err));
+
+
+
+
+
+
 
 const conn=mongoose.connection;
 //Init gfs
@@ -36,18 +44,19 @@ router.get('/',(req,res)=>{
  });
 
 
- //CourseName and DeptName
+//UPLOAD GET 
  router.get('/upload',(req,res)=>{
-    res.render('upload.ejs');
+    res.render('upload');
  });
 
 let tablename;
- //POST REQUEST
+ // UPLOAD POST REQUEST
 router.post('/upload',(req,res)=>{
  tablename = req.body.table;
 console.log(2,tablename);
 res.status(204).send();
  });
+
 //Create storage engine
 
  const storage = new GridFsStorage({
@@ -72,7 +81,7 @@ res.status(204).send();
    console.log(5,tablename);
    });
  
- router.get('/:collection',(req,res)=>{
+ router.get('/files/:collection',(req,res)=>{
   let collection = req.params.collection;
   gfs.collection(collection);
   gfs.files.find().toArray((err, files) => {
@@ -97,7 +106,7 @@ res.status(204).send();
 
  // @route DELETE /files/:id
 // @desc  Delete file
-router.delete('/:collection/:id', (req, res) => {
+router.delete('files/:collection/:id', (req, res) => {
   gfs.remove({ _id: req.params.id, root: req.params.collection }, (err, gridStore) => {
     if (err) {
       return res.status(404).json({ err: err });
@@ -106,7 +115,6 @@ router.delete('/:collection/:id', (req, res) => {
     res.redirect('/');
   });
 });
-
 
  module.exports=router;
 
