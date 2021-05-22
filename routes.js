@@ -26,76 +26,87 @@ const conn=mongoose.connection;
 let gfs;
 conn.once('open',()=>{
 gfs= Grid(conn.db,mongoose.mongo);
-gfs.collection('tablename') //Table
+
    })
    
 // @route GET/
 //Home page
-router.get('/',(req,res)=>{
-    res.render('index'); 
+router.get('/',(req,res)=>{ 
+  res.send('Hello World')
  });
- 
+
+
  //CourseName and DeptName
  router.get('/upload',(req,res)=>{
     res.render('upload.ejs');
  });
- 
+
+let tablename;
  //POST REQUEST
- router.post('/upload',(req,res)=>{
-   
-   console.log(req.body.table);
-   
-   const tablename = req.body.table;
-   
-   res.render('uploadfile.ejs');
-   
- 
- 
- //Create storage engine
+router.post('/upload',(req,res)=>{
+ tablename = req.body.table;
+console.log(2,tablename);
+res.status(204).send();
+ });
+//Create storage engine
+
  const storage = new GridFsStorage({
- url: mongoURI,
- file: (req, file) => {
-   return new Promise((resolve, reject) => {
-     crypto.randomBytes(16, (err, buf) => {
-       if (err) {
-         return reject(err);
-       }
-       const filename = buf.toString('hex') + path.extname(file.originalname);
-       const fileInfo = {
-         filename: filename,
-         bucketName: tablename
-       };
-       resolve(fileInfo);
-     });
-   });
+  url: mongoURI,
+  file: (req, file) => {
+    console.log(4,tablename)
+    return {
+          filename: file.originalname,
+          bucketName: tablename
+        };
+  },
+  options: {
+   useUnifiedTopology: true,
  }
- });
- 
- const upload = multer({storage});
- 
- //POST request on file submission
- router.post('/uploadfile',upload.single('file'),(req,res)=>{
- // res.json({file:req.file});
-  res.redirect('/');
- console.log(req.body);
-  
   });
- })
+  
+  const upload = multer({storage});
+
+  //POST request on file submission
+  router.post('/uploadfile',upload.single('file'),(req,res)=>{
+   res.redirect('/');
+   console.log(5,tablename);
+   });
  
- router.get('/files',(req,res)=>{
-   gfs.collection('ECM');
-   gfs.files.find().toArray((err,files)=>{
- 
-     if(!files || files.length ===0){
-       return res.status(404).json({
-         err:'No files exist'
-       });
-     }
-     //Files exist
-     return res.json(files);
- 
-   })
+ router.get('/:collection',(req,res)=>{
+  let collection = req.params.collection;
+  gfs.collection(collection);
+  gfs.files.find().toArray((err, files) => {
+    // Check if files
+    if (!files || files.length === 0) {
+      res.render('index', { files: false,collection:collection });
+    } else {
+      files.map(file => {
+        if (
+          file.contentType === 'image/jpeg' ||
+          file.contentType === 'image/png'
+        ) {
+          file.isImage = true;
+        } else {
+          file.isImage = false;
+        }
+      });
+      res.render('index', { files: files,collection:collection });
+    }
+  });
  });
+
+ // @route DELETE /files/:id
+// @desc  Delete file
+router.delete('/:collection/:id', (req, res) => {
+  gfs.remove({ _id: req.params.id, root: req.params.collection }, (err, gridStore) => {
+    if (err) {
+      return res.status(404).json({ err: err });
+    }
+
+    res.redirect('/');
+  });
+});
+
 
  module.exports=router;
 

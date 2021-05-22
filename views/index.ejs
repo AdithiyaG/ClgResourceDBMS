@@ -12,8 +12,22 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 m-auto">
-                <h1 class="text-center display-4 my-4">Mongo File Uploads</h1>
+                <h1 class="text-center display-4 my-4"><%= collection %> </h1>
                 <a href='http://localhost:5000/upload'>upload file</a>
+                <hr>
+        
+        <% if(files){ %>
+          <% files.map((file)=> { %>
+            <div class="card card-body mb-3">
+                  <%= file.filename %>
+                      <form method="POST" action="/<%= collection %>/<%= file._id %>?_method=DELETE">
+                        <button class="btn btn-danger btn-block mt-4">Delete</button>
+                      </form>
+            </div>
+            <% }) %>
+              <% } else { %>
+                <p>No files to show</p>
+                <% } %>
             </div>
         </div>
     </div>
