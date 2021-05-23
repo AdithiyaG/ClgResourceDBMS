@@ -43,19 +43,14 @@ router.get('/',(req,res)=>{
   res.send('Hello World')
  });
 
-
+ let tablename;
 //UPLOAD GET 
- router.get('/upload',(req,res)=>{
-    res.render('upload');
+ router.get('/files/:collection/upload',(req,res)=>{
+    res.render('upload',{ collection:req.params.collection });
+    tablename = req.params.collection;
+
  });
 
-let tablename;
- // UPLOAD POST REQUEST
-router.post('/upload',(req,res)=>{
- tablename = req.body.table;
-console.log(2,tablename);
-res.status(204).send();
- });
 
 //Create storage engine
 
@@ -89,24 +84,15 @@ res.status(204).send();
     if (!files || files.length === 0) {
       res.render('index', { files: false,collection:collection });
     } else {
-      files.map(file => {
-        if (
-          file.contentType === 'image/jpeg' ||
-          file.contentType === 'image/png'
-        ) {
-          file.isImage = true;
-        } else {
-          file.isImage = false;
-        }
-      });
       res.render('index', { files: files,collection:collection });
+      
     }
   });
  });
 
  // @route DELETE /files/:id
 // @desc  Delete file
-router.delete('files/:collection/:id', (req, res) => {
+router.delete('/files/:collection/:id', (req, res) => {
   gfs.remove({ _id: req.params.id, root: req.params.collection }, (err, gridStore) => {
     if (err) {
       return res.status(404).json({ err: err });
@@ -115,6 +101,38 @@ router.delete('files/:collection/:id', (req, res) => {
     res.redirect('/');
   });
 });
+
+
+router.post('/files/:collection/:id',(req,res)=>{
+
+
+  let collection = req.params.collection;
+  let id=  req.params.id;
+  gfs.collection(collection);
+  gfs.findOne({ _id: id}, function (err, file) {
+    console.log('Found');
+    let mimeType = file.contentType;
+  if (!mimeType) {
+      mimeType = mime.lookup(file.filename);
+  }
+  res.set({
+      'Content-Type': mimeType,
+      'Content-Disposition': 'attachment; filename=' + file.filename
+  });
+
+  const readStream = gfs.createReadStream({
+      _id: file._id
+  });
+  readStream.on('error', err => {
+      // report stream error
+      console.log(err);
+  });
+  // the response will be the file itself.
+  readStream.pipe(res);
+  });
+});
+
+
 
  module.exports=router;
 
