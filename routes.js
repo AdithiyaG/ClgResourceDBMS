@@ -57,11 +57,12 @@ router.get('/',(req,res)=>{
  const storage = new GridFsStorage({
   url: mongoURI,
   file: (req, file) => {
-    console.log(4,tablename)
+    console.log(req);
     return {
           filename: file.originalname,
           bucketName: tablename
         };
+  
   },
   options: {
    useUnifiedTopology: true,
@@ -71,7 +72,7 @@ router.get('/',(req,res)=>{
   const upload = multer({storage});
 
   //POST request on file submission
-  router.post('/uploadfile',upload.single('file'),(req,res)=>{
+  router.post('/uploadfile',upload.any(),(req,res)=>{
    res.redirect('/');
    console.log(5,tablename);
    });

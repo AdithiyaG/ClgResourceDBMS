@@ -17,15 +17,14 @@ mongoose2.createConnection(mongoURIauth, {
     })
     .catch(err => console.log(err));
 
-    authapp.use(require("express-session")({
-        secret:"Any normal Word",       //decode or encode session
-        resave: false,          
-        saveUninitialized:false    
-    }));
+authapp.use(require("express-session")({
+    secret:"Any normal Word",       //decode or encode session
+    resave: false,          
+    saveUninitialized:false    
+}));
     passport.serializeUser(User.serializeUser());       //session encoding
     passport.deserializeUser(User.deserializeUser());   //session decoding
     passport.use(new LocalStrategy(User.authenticate()));
-
 
     authapp.use(passport.initialize());
     authapp.use(passport.session());
@@ -47,7 +46,6 @@ mongoose2.createConnection(mongoURIauth, {
     authapp.post("/login",passport.authenticate("local",{
         successRedirect:"/userprofile",
         failureRedirect:"/login",
-        failureFlash: 'Invalid username or password.'
     }),function (req, res){
     });
 
@@ -59,7 +57,7 @@ mongoose2.createConnection(mongoURIauth, {
 
     authapp.post("/register",(req,res)=>{
         
-        User.register(new User({username: req.body.username,phone:req.body.phone,telephone: req.body.telephone}),req.body.password,function(err,user){
+        User.register(new User({username: req.body.username,phone:req.body.phone,email: req.body.email}),req.body.password,function(err,user){
             if(err){
                 console.log(err);
                 res.render("register");
