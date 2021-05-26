@@ -43,24 +43,33 @@ router.get('/',(req,res)=>{
   res.send('Hello World')
  });
 
- let tablename;
 //UPLOAD GET 
- router.get('/files/:collection/upload',(req,res)=>{
-    res.render('upload',{ collection:req.params.collection });
-    tablename = req.params.collection;
+ router.get('/files/mainfs/upload',(req,res)=>{
+    res.render('upload');
 
  });
 
+
+ let updatedMetadata;
+
+const updateMetadata = id => {
+  updatedMetadata = id;
+};
+
+router.get('/courses',(req,res)=>{
+  res.render('courses',{name:'ME'})
+})
 
 //Create storage engine
 
  const storage = new GridFsStorage({
   url: mongoURI,
   file: (req, file) => {
-    console.log(req);
+    
     return {
           filename: file.originalname,
-          bucketName: tablename
+          bucketName: 'mainfs',
+          metadata: updatedMetadata ? updatedMetadata : null
         };
   
   },
@@ -71,21 +80,47 @@ router.get('/',(req,res)=>{
   
   const upload = multer({storage});
 
+  let coursename;
+  router.post('/upload',(req,res)=>{
+
+    console.log(req.body.semno);
+    console.log(req.body.course);
+    coursename=[req.body.semno,req.body.course];
+
+    res.status(204).send();
+  });
+
+  
   //POST request on file submission
-  router.post('/uploadfile',upload.any(),(req,res)=>{
-   res.redirect('/');
-   console.log(5,tablename);
-   });
+  router.post('/uploadfile',(req, res, next) => {
+    updateMetadata(coursename); //Static test value
+    next();
+    res.redirect('/courses');
+    
+  },upload.single('file'));
  
- router.get('/files/:collection',(req,res)=>{
-  let collection = req.params.collection;
-  gfs.collection(collection);
+ router.get('/files/mainfs/:department/:course',(req,res)=>{
+  let department = req.params.department;
+  let course = req.params.course;
+  
+  gfs.collection('mainfs');
   gfs.files.find().toArray((err, files) => {
     // Check if files
     if (!files || files.length === 0) {
-      res.render('index', { files: false,collection:collection });
+      res.render('index', { files: false,department:department,course:course});
     } else {
-      res.render('index', { files: files,collection:collection });
+      files.map(file => {
+        console.log(1,department,2,course,3,file.metadata[1],4,file.metadata[0])
+        if(file.metadata[0] === department && file.metadata[1] === course)
+        {
+          file.isReq = true;
+        }
+        else
+        {
+          file.isReq = false
+        }
+      });
+      res.render('index', { files: files,department:department,course:course});
       
     }
   });
@@ -93,23 +128,26 @@ router.get('/',(req,res)=>{
 
  // @route DELETE /files/:id
 // @desc  Delete file
-router.delete('/files/:collection/:id', (req, res) => {
-  gfs.remove({ _id: req.params.id, root: req.params.collection }, (err, gridStore) => {
+router.delete('/files/mainfs/:department/:course/:id', (req, res) => {
+  let department = req.params.department;
+  let course = req.params.course;
+  gfs.remove({ _id: req.params.id, root: 'mainfs' }, (err, gridStore) => {
     if (err) {
       return res.status(404).json({ err: err });
     }
 
-    res.redirect('/');
+    res.redirect(`/files/mainfs/${ req.params.department}/${ req.params.course}`);
   });
 });
 
 
-router.post('/files/:collection/:id',(req,res)=>{
+router.post('/files/mainfs/:department/:course/:id',(req,res)=>{
 
 
-  let collection = req.params.collection;
+  let department = req.params.department;
+  let course = req.params.course;
   let id=  req.params.id;
-  gfs.collection(collection);
+  gfs.collection('mainfs');
   gfs.findOne({ _id: id}, function (err, file) {
     console.log('Found');
     let mimeType = file.contentType;

@@ -12,29 +12,31 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 m-auto">
-                <h1 class="text-center display-4 my-4"><%= collection %> </h1>
-                <a href='http://localhost:5000/files/<%= collection %>/upload '>upload file</a>
+                <h1 class="text-center display-4 my-4"><%= course %> </h1>
+                <a href='http://localhost:5000/files/mainfs/upload '>upload file</a>
                 <hr>
         
         <% if(files){ %>
           <% files.map((file)=> { %>
             <div class="card card-body mb-3">
+              <% if(file.isReq) { %>
                   <%= file.filename %>
                   <div class="row align-items-start">
                     <div class="col-2">
-                      <form method="POST" action="/files/<%= collection %>/<%= file._id %>">
+                      <form method="POST" action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>">
                         <button class="btn btn-success btn-block mt-4">Download</button>
                       </form>
                     </div>
-                    <div class="col-2">
-                      <form method="POST" action="/files/<%= collection %>/<%= file._id %>?_method=DELETE">
+                    <div class="col-2 mr-2" style="margin-left:10px">
+                      <form method="POST" action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>?_method=DELETE">
                         <button class="btn btn-danger btn-block mt-4">Delete</button>
                       </form>
 
                     </div>
                        
                   </div>
-
+                  <% } else { %>
+                    <% } %>
             </div>
             <% }) %>
               <% } else { %>
