@@ -6,6 +6,8 @@ const GridFsStorage =require('multer-gridfs-storage');
 const Grid =require('gridfs-stream');
 const router=express.Router();
 const path=require('path');
+var MongoClient = require('mongodb').MongoClient;
+const deasync = require('deasync');
 
 
 
@@ -44,7 +46,11 @@ router.get('/',(req,res)=>{
  });
 
 //UPLOAD GET 
- router.get('/files/mainfs/upload',(req,res)=>{
+let coursename;
+ router.get('/files/mainfs/:department/:course/upload',(req,res)=>{
+  console.log(req.params.department);
+  console.log(req.params.course);
+  coursename=[req.params.department,req.params.course];
     res.render('upload');
 
  });
@@ -55,10 +61,39 @@ router.get('/',(req,res)=>{
 const updateMetadata = id => {
   updatedMetadata = id;
 };
-
+function getDept()
+{
+  var ret;
+  MongoClient.connect(mongoURI, function(err, db) {
+    if (err) throw err;
+    var dbo=db.db('test');
+     dbo.collection("courseDatabase").find({}, { projection: { _id: 0 } }).toArray(function(err, result) {
+    ret = result;
+    db.close();
+  });
+  });
+  while((ret == null))
+  {
+       deasync.runLoopOnce();
+  }
+  return (ret);
+}
 router.get('/courses',(req,res)=>{
-  res.render('courses',{name:'ME'})
+  var dept = getDept();
+  console.log(dept[0].department);
+  res.render('courses',{dept:dept,de1:false})
 })
+
+router.get('/:dept',(req,res)=>{
+  var dept = getDept();
+  var dept1=req.params.dept;
+  dept.map((de)=>{
+    if(de.department == dept1){
+    res.render('courses',{dept:dept,de1:true,de:de})}
+
+  })
+  
+});
 
 //Create storage engine
 
@@ -80,15 +115,6 @@ router.get('/courses',(req,res)=>{
   
   const upload = multer({storage});
 
-  let coursename;
-  router.post('/upload',(req,res)=>{
-
-    console.log(req.body.semno);
-    console.log(req.body.course);
-    coursename=[req.body.semno,req.body.course];
-
-    res.status(204).send();
-  });
 
   
   //POST request on file submission
@@ -111,7 +137,7 @@ router.get('/courses',(req,res)=>{
     } else {
       files.map(file => {
         console.log(1,department,2,course,3,file.metadata[1],4,file.metadata[0])
-        if(file.metadata[0] === department && file.metadata[1] === course)
+        if(file.metadata[1] === course)
         {
           file.isReq = true;
         }
