@@ -35,7 +35,7 @@
 
 <body>
     <nav class="navbar navbar-expand-lg">
-        <a class="navbar-brand" href="#">College Resource</a>
+        <a class="navbar-brand" href="/courses">College Resource</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -67,9 +67,10 @@
                 </div>
             </div>
             <br>
-            <b style="font-size: 40px;">Courses</b><br>
+            <% if(de1){ %>
+                <% var dep=de.department %>
+            <b style="font-size: 40px;"> <%= de.department %> Courses</b><br>
             <div>
-                <% if(de1){ %>
                 <div style="text-align: left; font-size:30px;">
                     <% for (var i =0; i <=6;  i++ ) { %>
                     <a href="/files/mainfs/<%= de.department %>/<%= de.courses[i]%>" id="course2"><%= de.courses[i]  %> </a>
@@ -93,7 +94,7 @@
             $(function () {
                 $(".dropdown-menu").on('click', 'a', function () {
                     $(".btn:first-child").text($(this).text());
-                    $(".btn:first-child").val($(this).text());
+                    // $(".btn:first-child").val($(this).text());
                 });
             });
         </script>

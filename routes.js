@@ -80,18 +80,22 @@ function getDept()
 }
 router.get('/courses',(req,res)=>{
   var dept = getDept();
-  console.log(dept[0].department);
   res.render('courses',{dept:dept,de1:false})
 })
 
 router.get('/:dept',(req,res)=>{
   var dept = getDept();
+  var flag=0;
   var dept1=req.params.dept;
   dept.map((de)=>{
     if(de.department == dept1){
+      flag=1;
     res.render('courses',{dept:dept,de1:true,de:de})}
-
-  })
+  });
+  if(flag==0){
+    res.render('courses',{dept:dept,de1:false})
+  }
+  
   
 });
 
@@ -136,7 +140,6 @@ router.get('/:dept',(req,res)=>{
       res.render('index', { files: false,department:department,course:course});
     } else {
       files.map(file => {
-        console.log(1,department,2,course,3,file.metadata[1],4,file.metadata[0])
         if(file.metadata[1] === course)
         {
           file.isReq = true;
