@@ -123,11 +123,16 @@ router.get('/courses/:dept',(req,res)=>{
   
   //POST request on file submission
   router.post('/uploadfile',(req, res, next) => {
-    updateMetadata(coursename); //Static test value
+    updateMetadata(coursename); 
     next();
-    res.redirect('/courses');
+    res.redirect(`/files/mainfs/${coursename[0]}/${coursename[1]}`);
     
-  },upload.single('file'));
+  },upload.single('file'),
+  (req,res)=>{
+    console.log('back');
+    res.redirect('back');
+  }
+  );
  
  router.get('/files/mainfs/:department/:course',(req,res)=>{
   let department = req.params.department;
