@@ -8,10 +8,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./css/bootstrap.css">
+    <link rel="stylesheet" href="/css/bootstrap.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <title>Clg Resource</title>
+    <title>College Resource Management</title>
 </head>
 <style>
     .center {
@@ -53,16 +53,24 @@
         <ol class="breadcrumb">
             <li><a href="/courses">Home</a></li>
         </ol>
-        <br /><br />
+        <br />
+        <% if(menu == false){ %>
+            <p class="text-primary">Select Department from Menu</p>
+        <% } %>
+        <br />
         <div>
             <div class="dropdown navbar-right">
                 <button class="btn btn-secondary dropdown-toggle btn-lg" type="button" id="dropdownMenuButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <% if(menu == false){ %>
                     Department
+                    <% } else{ %>
+                    <%= dept1%>
+                    <% } %>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <% for (var i =0; i <=1;  i++ ) { %>
-                        <a class="dropdown-item" href='<%= dept[i].department %>' id='dept'><%= dept[i].department %></a> 
+                        <a class="dropdown-item" href='/courses/<%= dept[i].department %>' id='dept'><%= dept[i].department %></a> 
                         <% } %>
                 </div>
             </div>
