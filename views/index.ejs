@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/css/bootstrap.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-  <title>Clg Resource</title>
+  <title>College Resource Management</title>
 </head>
 
 <body>
@@ -34,8 +34,8 @@
   </nav>
   <div class="container">
     <ol class="breadcrumb">
-      <li><a href="/courses">Home</a></li>
-      <li><a href="/index">Course Page</a></li>
+      <li><a href="/courses/<%= department %>">Home</a></li>
+      <li><a href="#">Course Page (<%= course%>)</a></li>
     </ol>
     <br /><br />
     <div class="row">
@@ -43,9 +43,8 @@
         <h1 class="text-center display-4 my-4">
           <%= course %>
         </h1>
-        <a href='http://localhost:5000/files/mainfs/<%= department %>/<%= course %>/upload '>upload file</a>
+        <a class="btn btn-primary" href='http://localhost:5000/files/mainfs/<%= department %>/<%= course %>/upload '>Upload file</a>
         <hr>
-
         <% if(files){ %>
         <% var count=true %>
           <% files.map((file)=> { %>
@@ -64,9 +63,7 @@
                         action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>?_method=DELETE">
                         <button class="btn btn-danger btn-block mt-4">Delete</button>
                       </form>
-
                     </div>
-
                   </div>
                   <% } %>
             </div>
