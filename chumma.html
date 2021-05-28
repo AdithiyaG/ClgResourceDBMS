@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +17,7 @@
 
 <body>
   <nav class="navbar navbar-expand-lg">
-    <a class="navbar-brand" href="/courses">College Resource</a>
+    <a class="navbar-brand" href="#">College Resource</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -34,47 +35,92 @@
   </nav>
   <div class="container">
     <ol class="breadcrumb">
-      <li><a href="/courses/<%= department %>">Home</a></li>
-      <li><a href="#">Course Page (<%= course%>)</a></li>
+      <li><a href="/courses/ECM">Home</a></li>
+      <li><a href="#">Course Page (Database Management System)</a></li>
     </ol>
     <br /><br />
     <div class="row">
       <div class="col-md-6 m-auto">
         <h1 class="text-center display-4 my-4">
-          <%= course %>
+          Database Management System
         </h1>
-        <a class="btn btn-primary" href='http://localhost:5000/files/mainfs/<%= department %>/<%= course %>/upload '>Upload file</a>
+        <a class="btn btn-primary" href='http://localhost:5000/files/mainfs/ECM/Database Management System/upload '>Upload file</a>
         <hr>
-        <% if(files){ %>
-        <% var count=true %>
-          <% files.map((file)=> { %>
-              <% if(file.isReq) { %>
-                <% count=false %>
-                <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
-                <%= file.filename %>
+        <div>
+        
+          
+              
+            
+              
+            
+              
+            
+              
+                
+                <div class="card card-body mb-3">
+                Copy of CRICKET TOURNAMENT - Made with PosterMyWall.jpg
                   <div class="row align-items-start">
                     <div class="col-2">
-                      <form method="POST" action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>">
+                      <form method="POST" action="/files/mainfs/ECM/Database Management System/60b07b8ccc74ff39b4399f12">
                         <button class="btn btn-success mt-4">Download</button>
                       </form>
                     </div>
                     <div class="col-2 mr-2" style="margin-left:10px">
                       <form method="POST"
-                        action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>?_method=DELETE">
+                        action="/files/mainfs/ECM/Database Management System/60b07b8ccc74ff39b4399f12?_method=DELETE">
                         <button class="btn btn-danger mt-4">Delete</button>
                       </form>
                     </div>
                   </div>
-                </div>
                   <br>
-                  <% } %>
-            <% }) %>
-            <% if(count){ %>
-              <p>No files to show</p>
-              <% } %>
-              <% } else { %>
-                <p>No files to show</p>
-                <% } %>
+                  
+            
+              
+            
+              
+            
+              
+                
+                <div class="card card-body mb-3">
+                FAQ.pdf
+                  <div class="row align-items-start">
+                    <div class="col-2">
+                      <form method="POST" action="/files/mainfs/ECM/Database Management System/60b0c2b61f932138088c569c">
+                        <button class="btn btn-success mt-4">Download</button>
+                      </form>
+                    </div>
+                    <div class="col-2 mr-2" style="margin-left:10px">
+                      <form method="POST"
+                        action="/files/mainfs/ECM/Database Management System/60b0c2b61f932138088c569c?_method=DELETE">
+                        <button class="btn btn-danger mt-4">Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                  <br>
+                  
+            
+              
+                
+                <div class="card card-body mb-3">
+                AceInValorant.png
+                  <div class="row align-items-start">
+                    <div class="col-2">
+                      <form method="POST" action="/files/mainfs/ECM/Database Management System/60b10777dcf82a22ecc11880">
+                        <button class="btn btn-success mt-4">Download</button>
+                      </form>
+                    </div>
+                    <div class="col-2 mr-2" style="margin-left:10px">
+                      <form method="POST"
+                        action="/files/mainfs/ECM/Database Management System/60b10777dcf82a22ecc11880?_method=DELETE">
+                        <button class="btn btn-danger mt-4">Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                  <br>
+                  
+            
+            
+              
           </div>
       </div>
     </div>
@@ -87,5 +133,6 @@
     crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"
     integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
 </body>
 </html>
