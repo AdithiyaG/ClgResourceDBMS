@@ -51,7 +51,7 @@ let coursename;
   console.log(req.params.department);
   console.log(req.params.course);
   coursename=[req.params.department,req.params.course];
-    res.render('upload');
+    res.render('upload',{dept:coursename[0],course:coursename[1]});
 
  });
 
@@ -80,20 +80,20 @@ function getDept()
 }
 router.get('/courses',(req,res)=>{
   var dept = getDept();
-  res.render('courses',{dept:dept,de1:false})
+  res.render('courses',{dept:dept,de1:false,menu:false})
 })
 
-router.get('/:dept',(req,res)=>{
+router.get('/courses/:dept',(req,res)=>{
   var dept = getDept();
   var flag=0;
   var dept1=req.params.dept;
   dept.map((de)=>{
     if(de.department == dept1){
       flag=1;
-    res.render('courses',{dept:dept,de1:true,de:de})}
+    res.render('courses',{dept:dept,de1:true,de:de,menu:true,dept1:dept1})}
   });
   if(flag==0){
-    res.render('courses',{dept:dept,de1:false})
+    res.render('courses',{dept:dept,de1:false,menu:true,dept1:dept1})
   }
   
   
@@ -171,8 +171,6 @@ router.delete('/files/mainfs/:department/:course/:id', (req, res) => {
 
 
 router.post('/files/mainfs/:department/:course/:id',(req,res)=>{
-
-
   let department = req.params.department;
   let course = req.params.course;
   let id=  req.params.id;
