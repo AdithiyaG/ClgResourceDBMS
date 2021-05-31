@@ -119,7 +119,23 @@ router.get('/courses/:dept',(req,res)=>{
   
   const upload = multer({storage});
 
-
+  function getDownload()
+  {
+    var ret;
+    MongoClient.connect(mongoURI, function(err, db) {
+      if (err) throw err;
+      var dbo=db.db('test');
+       dbo.collection("courseDatabase").find({}, { projection: { _id: 0 } }).toArray(function(err, result) {
+      ret = result;
+      db.close();
+    });
+    });
+    while((ret == null))
+    {
+         deasync.runLoopOnce();
+    }
+    return (ret);
+  }
   
   //POST request on file submission
   router.post('/uploadfile',(req, res, next) => {
@@ -127,7 +143,7 @@ router.get('/courses/:dept',(req,res)=>{
     next();
     res.redirect(`/files/mainfs/${coursename[0]}/${coursename[1]}`);
     
-  },upload.single('file'),
+  },upload.array('file'),
   (req,res)=>{
     console.log('back');
     res.redirect('back');
@@ -174,6 +190,23 @@ router.delete('/files/mainfs/:department/:course/:id', (req, res) => {
   });
 });
 
+function setDownload()
+  {
+    var ret;
+    MongoClient.connect(mongoURI, function(err, db) {
+      if (err) throw err;
+      var dbo=db.db('test');
+       dbo.collection("dwndhistory").insertOne({}, { projection: { _id: 0 } }).toArray(function(err, result) {
+      ret = result;
+      db.close();
+    });
+    });
+    while((ret == null))
+    {
+         deasync.runLoopOnce();
+    }
+    return (ret);
+  }
 
 router.post('/files/mainfs/:department/:course/:id',(req,res)=>{
   let department = req.params.department;
