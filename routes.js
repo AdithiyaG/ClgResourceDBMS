@@ -138,10 +138,10 @@ router.get('/courses/:dept',(req,res)=>{
   }
   
   //POST request on file submission
-  router.post('/uploadfile',(req, res, next) => {
+  router.post('/files/mainfs/:dept/:course/uploadfile',(req, res, next) => {
     updateMetadata(coursename); 
     next();
-    res.redirect(`/files/mainfs/${coursename[0]}/${coursename[1]}`);
+    res.redirect(`/files/mainfs/${req.params.dept}/${req.params.course}`);
     
   },upload.array('file'),
   (req,res)=>{
@@ -158,7 +158,7 @@ router.get('/courses/:dept',(req,res)=>{
   gfs.files.find().toArray((err, files) => {
     // Check if files
     if (!files || files.length === 0) {
-      res.render('index', { files: false,department:department,course:course});
+      res.render('index', { files: false,department:department,course:course,fileGot:false});
     } else {
       files.map(file => {
         if(file.metadata[1] === course)
@@ -170,7 +170,7 @@ router.get('/courses/:dept',(req,res)=>{
           file.isReq = false
         }
       });
-      res.render('index', { files: files,department:department,course:course});
+      res.render('index', { files: files,department:department,course:course,fileGot:false});
       
     }
   });
