@@ -119,22 +119,23 @@ router.get('/courses/:dept',(req,res)=>{
   
   const upload = multer({storage});
 
-  function getDownload()
+  function getDownload(fileidarray)
   {
     var ret;
     MongoClient.connect(mongoURI, function(err, db) {
       if (err) throw err;
       var dbo=db.db('test');
-       dbo.collection("courseDatabase").find({}, { projection: { _id: 0 } }).toArray(function(err, result) {
-      ret = result;
-      db.close();
+      console.log(2,fileidarray);
+      for(i of fileidarray){
+        console.log(i);
+        dbo.collection("downloadstatus").findOne({fileid:i}, { projection: { _id: 0 } },function(err, result) {
+          ret = result;
+          console.log(result);
+          db.close();
+        });
+      }
     });
-    });
-    while((ret == null))
-    {
-         deasync.runLoopOnce();
-    }
-    return (ret);
+    
   }
   
   //POST request on file submission
@@ -143,17 +144,13 @@ router.get('/courses/:dept',(req,res)=>{
     next();
     res.redirect(`/files/mainfs/${req.params.dept}/${req.params.course}`);
     
-  },upload.array('file'),
-  (req,res)=>{
-    console.log('back');
-    res.redirect('back');
-  }
+  },upload.array('file')
   );
  
  router.get('/files/mainfs/:department/:course',(req,res)=>{
   let department = req.params.department;
   let course = req.params.course;
-  
+  let fileidarray=[];
   gfs.collection('mainfs');
   gfs.files.find().toArray((err, files) => {
     // Check if files
@@ -164,12 +161,18 @@ router.get('/courses/:dept',(req,res)=>{
         if(file.metadata[1] === course)
         {
           file.isReq = true;
+          fileidarray.push(file._id);
+
         }
         else
         {
           file.isReq = false
         }
+
       });
+      console.log(fileidarray);
+      idarray=getDownload(fileidarray);
+      console.log(idarray);
       res.render('index', { files: files,department:department,course:course,fileGot:false});
       
     }
@@ -190,29 +193,38 @@ router.delete('/files/mainfs/:department/:course/:id', (req, res) => {
   });
 });
 
-function setDownload()
+function setDownload(id)
   {
     var ret;
     MongoClient.connect(mongoURI, function(err, db) {
       if (err) throw err;
       var dbo=db.db('test');
-       dbo.collection("dwndhistory").insertOne({}, { projection: { _id: 0 } }).toArray(function(err, result) {
+       dbo.collection("downloadstatus").findOne({fileid:id}, { projection: { _id: 0 } },function(err, result) {
       ret = result;
+      console.log(2,result);
+      if(ret==null){
+        dbo.collection("downloadstatus").insertOne({fileid:id,downloads:1},function(err,result){
+          console.log('inserted')
+        });
+      }
+       
+    else if(ret.fileid == id ){
+      dbo.collection("downloadstatus").updateOne({fileid:id},{$set:{downloads:ret.downloads+1}},function(err,result){
+        console.log('updated')
+      })
+    }
       db.close();
     });
     });
-    while((ret == null))
-    {
-         deasync.runLoopOnce();
-    }
-    return (ret);
+   
   }
 
-router.post('/files/mainfs/:department/:course/:id',(req,res)=>{
+router.post('/files/mainfs/download/:department/:course/:id',(req,res)=>{
   let department = req.params.department;
   let course = req.params.course;
   let id=  req.params.id;
   gfs.collection('mainfs');
+  setDownload(id);
   gfs.findOne({ _id: id}, function (err, file) {
     console.log('Found');
     let mimeType = file.contentType;

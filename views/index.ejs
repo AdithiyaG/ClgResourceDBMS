@@ -52,10 +52,11 @@
                 <% count=false %>
                 <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
                 <%= file.filename %>
+                <p>Downloads:<%=file.downloads %> </p>
                   <div class="row align-items-start">
                     <div class="col-2">
-                      <form method="POST" action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>">
-                        <button class="btn btn-success btn-block mt-4" id='downloadbtn' onclick="counter()">Download</button>
+                      <form method="POST" action="/files/mainfs/download/<%= department%>/<%= course%>/<%= file._id %>">
+                        <button class="btn btn-success btn-block mt-4" id='downloadbtn'>Download</button>
                       </form>
                     </div>
                     <div class="col-2 mr-2" style="margin-left:10px">
