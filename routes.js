@@ -118,24 +118,32 @@ router.get('/courses/:dept',(req,res)=>{
   });
   
   const upload = multer({storage});
-
-  function getDownload(fileidarray)
+  function indiFile()
   {
-    var ret;
+    var ret
     MongoClient.connect(mongoURI, function(err, db) {
       if (err) throw err;
       var dbo=db.db('test');
-      console.log(2,fileidarray);
-      for(i of fileidarray){
-        console.log(i);
-        dbo.collection("downloadstatus").findOne({fileid:i}, { projection: { _id: 0 } },function(err, result) {
+        dbo.collection("downloadstatus").find({}, { projection: { _id: 0 }}).toArray(function(err, result) {
           ret = result;
           console.log(result);
           db.close();
         });
-      }
     });
-    
+    while(ret == null)
+    {
+      deasync.runLoopOnce();
+    }
+    return ret;
+  }
+  function getDownload(fileidarray)
+  {
+    var ret = [];
+    for(i of fileidarray)
+    {
+      ret.push(indiFile(i));
+    }
+    console.log(ret);
   }
   
   //POST request on file submission
@@ -150,19 +158,34 @@ router.get('/courses/:dept',(req,res)=>{
  router.get('/files/mainfs/:department/:course',(req,res)=>{
   let department = req.params.department;
   let course = req.params.course;
-  let fileidarray=[];
   gfs.collection('mainfs');
   gfs.files.find().toArray((err, files) => {
     // Check if files
     if (!files || files.length === 0) {
       res.render('index', { files: false,department:department,course:course,fileGot:false});
-    } else {
+    } else 
+    {
+      var downloadStat = [];
+      downloadStat = indiFile();
+      console.log(downloadStat);
       files.map(file => {
         if(file.metadata[1] === course)
         {
           file.isReq = true;
-          fileidarray.push(file._id);
-
+          for(i=0;i<downloadStat.length;i++)
+          {
+            console.log(downloadStat[i]);
+            if(downloadStat[i].fileid == file._id)
+            {
+              file.noDown = downloadStat[i].downloads;
+              break;
+            }
+            else
+            {
+              file.noDown = 0;
+            }
+          }
+          console.log(file.noDown);
         }
         else
         {
@@ -170,9 +193,6 @@ router.get('/courses/:dept',(req,res)=>{
         }
 
       });
-      console.log(fileidarray);
-      idarray=getDownload(fileidarray);
-      console.log(idarray);
       res.render('index', { files: files,department:department,course:course,fileGot:false});
       
     }

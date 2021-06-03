@@ -52,7 +52,7 @@
                 <% count=false %>
                 <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
                 <%= file.filename %>
-                <p>Downloads:<%=file.downloads %> </p>
+                <p>Downloads:<%=file.noDown %> </p>
                   <div class="row align-items-start">
                     <div class="col-2">
                       <form method="POST" action="/files/mainfs/download/<%= department%>/<%= course%>/<%= file._id %>">
