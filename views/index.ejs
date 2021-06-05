@@ -8,9 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/css/bootstrap.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
   <title>College Resource Management</title>
 </head>
 
@@ -33,13 +31,15 @@
     </div>
   </nav>
   <div class="container">
-    <ol class="breadcrumb">
-      <li><a href="/courses/<%= department %>">Home</a></li>
-      <li><a href="#">Course Page (<%= course%>)</a></li>
-    </ol>
+    <div class='mt-4'>   <ol class="breadcrumb">
+      <li class='breadcrumb-item'><a href="/courses/<%= department %>">Home</a></li>
+      <li class='breadcrumb-item active'><a href="#">Course Page (<%= course%>)</a></li>
+    </ol></div>
+ 
     <br /><br />
     <div class="row">
       <div class="col-md-6 m-auto">
+        <%- include ("./partials/messages"); %>  
         <h1 class="text-center display-4 my-4">
           <%= course %>
         </h1>

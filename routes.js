@@ -1,5 +1,4 @@
 const express = require('express');
-const crypto =require('crypto');
 const multer =require('multer');
 const mongoose =require('mongoose');
 const GridFsStorage =require('multer-gridfs-storage');
@@ -8,9 +7,12 @@ const router=express.Router();
 const path=require('path');
 var MongoClient = require('mongodb').MongoClient;
 const deasync = require('deasync');
-
-
-
+const passport = require('passport');
+const User = require('./models/User');
+const bcrypt = require('bcryptjs');
+const https = require('https')
+const axios = require('axios');
+const { ensureAuthenticated, forwardAuthenticated, ensureAuthenticateadmin } = require('./config/auth');
 //Mongo URI
 const mongoURI='mongodb+srv://admin:admin@clgfilesystem.wmbwk.mongodb.net/test?retryWrites=true&w=majority';
 
@@ -39,17 +41,98 @@ gfs= Grid(conn.db,mongoose.mongo);
 
    })
    
+
+
+   router.post('/register',forwardAuthenticated ,(req,res)=>{
+    const { name, email, password, password2 } = req.body;
+    let errors = [];
+  
+    if (!name || !email || !password || !password2) {
+      errors.push({ msg: 'Please enter all fields' });
+    }
+  
+    if (password != password2) {
+      errors.push({ msg: 'Passwords do not match' });
+    }
+  
+    if (password.length < 6) {
+      errors.push({ msg: 'Password must be at least 6 characters' });
+    }
+  
+    if (errors.length > 0) {
+      res.render('register', {
+        errors,
+        name,
+        email,
+        password,
+        password2
+      });
+    } 
+    else {
+      User.findOne({ email: email }).then(user => {
+        if (user) {
+          errors.push({ msg: 'Email already exists' });
+          res.render('register', {
+            errors,
+            name,
+            email,
+            password,
+            password2
+          });
+        } else {
+          const newUser = new User({
+            name,
+            email,
+            password
+          });
+  
+          bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if (err) throw err;
+              newUser.password = hash;
+              newUser
+                .save()
+                .then(user => {
+                  req.flash(
+                    'success_msg',
+                    'You are now registered and you can log in now'
+                  );
+                  res.redirect('/');
+                })
+                .catch(err => console.log(err));
+            });
+          });
+        }
+      });
+    }
+  });
+  
+  router.post('/login', forwardAuthenticated ,(req, res, next) => {
+    passport.authenticate('local', {
+      successRedirect: '/courses',
+      failureRedirect: '/',
+      failureFlash: true
+    })(req, res, next);
+  });
+  
+  router.get('/logout', (req, res) => {
+    req.logout();
+    req.flash('success_msg', 'You are logged out');
+    res.redirect('/');
+  });
 // @route GET/
 //Home page
 router.get('/',(req,res)=>{ 
-  res.send('Hello World')
+  res.render('login')
+ });
+
+ router.get('/register',(req,res)=>{ 
+  res.render('register')
  });
 
 //UPLOAD GET 
 let coursename;
- router.get('/files/mainfs/:department/:course/upload',(req,res)=>{
-  console.log(req.params.department);
-  console.log(req.params.course);
+ router.get('/files/mainfs/:department/:course/upload',ensureAuthenticateadmin,(req,res)=>{
   coursename=[req.params.department,req.params.course];
     res.render('upload',{dept:coursename[0],course:coursename[1]});
 
@@ -78,22 +161,22 @@ function getDept()
   }
   return (ret);
 }
-router.get('/courses',(req,res)=>{
+router.get('/courses',ensureAuthenticated,(req,res)=>{
   var dept = getDept();
-  res.render('courses',{dept:dept,de1:false,menu:false})
+  res.render('courses',{dept:dept,de1:false,menu:false,user: req.user})
 })
 
-router.get('/courses/:dept',(req,res)=>{
+router.get('/courses/:dept',ensureAuthenticated,(req,res)=>{
   var dept = getDept();
   var flag=0;
   var dept1=req.params.dept;
   dept.map((de)=>{
     if(de.department == dept1){
       flag=1;
-    res.render('courses',{dept:dept,de1:true,de:de,menu:true,dept1:dept1})}
+    res.render('courses',{dept:dept,de1:true,de:de,menu:true,dept1:dept1,user: req.user})}
   });
   if(flag==0){
-    res.render('courses',{dept:dept,de1:false,menu:true,dept1:dept1})
+    res.render('courses',{dept:dept,de1:false,menu:true,dept1:dept1,user: req.user})
   }
   
   
@@ -126,7 +209,6 @@ router.get('/courses/:dept',(req,res)=>{
       var dbo=db.db('test');
         dbo.collection("downloadstatus").find({}, { projection: { _id: 0 }}).toArray(function(err, result) {
           ret = result;
-          console.log(result);
           db.close();
         });
     });
@@ -136,18 +218,9 @@ router.get('/courses/:dept',(req,res)=>{
     }
     return ret;
   }
-  function getDownload(fileidarray)
-  {
-    var ret = [];
-    for(i of fileidarray)
-    {
-      ret.push(indiFile(i));
-    }
-    console.log(ret);
-  }
   
   //POST request on file submission
-  router.post('/files/mainfs/:dept/:course/uploadfile',(req, res, next) => {
+  router.post('/files/mainfs/:dept/:course/uploadfile',ensureAuthenticateadmin,(req, res, next) => {
     updateMetadata(coursename); 
     next();
     res.redirect(`/files/mainfs/${req.params.dept}/${req.params.course}`);
@@ -155,7 +228,7 @@ router.get('/courses/:dept',(req,res)=>{
   },upload.array('file')
   );
  
- router.get('/files/mainfs/:department/:course',(req,res)=>{
+ router.get('/files/mainfs/:department/:course',ensureAuthenticated,(req,res)=>{
   let department = req.params.department;
   let course = req.params.course;
   gfs.collection('mainfs');
@@ -167,14 +240,12 @@ router.get('/courses/:dept',(req,res)=>{
     {
       var downloadStat = [];
       downloadStat = indiFile();
-      console.log(downloadStat);
       files.map(file => {
         if(file.metadata[1] === course)
         {
           file.isReq = true;
           for(i=0;i<downloadStat.length;i++)
           {
-            console.log(downloadStat[i]);
             if(downloadStat[i].fileid == file._id)
             {
               file.noDown = downloadStat[i].downloads;
@@ -185,7 +256,6 @@ router.get('/courses/:dept',(req,res)=>{
               file.noDown = 0;
             }
           }
-          console.log(file.noDown);
         }
         else
         {
@@ -201,7 +271,7 @@ router.get('/courses/:dept',(req,res)=>{
 
  // @route DELETE /files/:id
 // @desc  Delete file
-router.delete('/files/mainfs/:department/:course/:id', (req, res) => {
+router.delete('/files/mainfs/:department/:course/:id', ensureAuthenticateadmin,(req, res) => {
   let department = req.params.department;
   let course = req.params.course;
   gfs.remove({ _id: req.params.id, root: 'mainfs' }, (err, gridStore) => {
@@ -221,7 +291,6 @@ function setDownload(id)
       var dbo=db.db('test');
        dbo.collection("downloadstatus").findOne({fileid:id}, { projection: { _id: 0 } },function(err, result) {
       ret = result;
-      console.log(2,result);
       if(ret==null){
         dbo.collection("downloadstatus").insertOne({fileid:id,downloads:1},function(err,result){
           console.log('inserted')
@@ -238,19 +307,23 @@ function setDownload(id)
     });
    
   }
+  let department1;
+  let course1;
 
-router.post('/files/mainfs/download/:department/:course/:id',(req,res)=>{
-  let department = req.params.department;
-  let course = req.params.course;
+router.post('/files/mainfs/download/:department/:course/:id',ensureAuthenticated,(req,res,next)=>{
+  department1=req.params.department;
+  course1=req.params.course;
   let id=  req.params.id;
   gfs.collection('mainfs');
   setDownload(id);
+  req.flash('success_msg', 'file downloaded');
   gfs.findOne({ _id: id}, function (err, file) {
     console.log('Found');
     let mimeType = file.contentType;
   if (!mimeType) {
       mimeType = mime.lookup(file.filename);
   }
+ 
   res.set({
       'Content-Type': mimeType,
       'Content-Disposition': 'attachment; filename=' + file.filename
@@ -266,9 +339,25 @@ router.post('/files/mainfs/download/:department/:course/:id',(req,res)=>{
   // the response will be the file itself.
   readStream.pipe(res);
   });
-});
 
+  console.log(department1);
+  console.log(course1);
+next();
+
+},(req,res)=>{
+  axios.get(`http://localhost:5000/files/mainfs/${department1}/${course1}`)
+  .then(response => {
+    console.log(1,response.data.url);
+    console.log(2,response.data.explanation);
+  })
+  .catch(error => {
+    console.log(error);
+  })
+}
+
+  );
 
 
  module.exports=router;
 
+ 
