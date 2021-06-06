@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <title>College Resource Management</title>
@@ -34,16 +34,16 @@
                     // SHOW THE EXTRACTED DETAILS OF THE FILE.
                     document.getElementById('uploadfilestext').innerHTML =
                         document.getElementById('uploadfilestext').innerHTML + '<br /> ' +
-                            fname + ' (<b>' + fsize + '</b> bytes)';
+                        fname + ' (<b>' + fsize + '</b> bytes)';
                 }
             }
-            else { 
-                alert('Please select a file.') 
+            else {
+                alert('Please select a file.')
             }
-            }
+        }
 
     </script>
-    
+
 
 </head>
 
@@ -58,7 +58,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" href="/courses/<%= dept%>">Home</a>
                 </li>
                 <li><a class="nav-link" href="/files/mainfs/<%= dept%>/<%= course%>">Course Page</a></li>
                 <li class="nav-item active"><a class="nav-link" href="#">Upload File</a></li>
@@ -66,20 +66,45 @@
         </div>
     </nav>
     <div class="container">
-        <ol class="breadcrumb">
-            <li><a href="/courses/<%= dept %>">Home</a></li>
-            <li><a href="/files/mainfs/<%= dept%>/<%= course%>">Course Page (<%= course%>)</a></li>
-            <li><a href="#">Upload file to <%= course%></a></li>
-          </ol>
-          <br /><br />
+        <div class='mt-4'>
+            <ol class="breadcrumb">
+                <li class='breadcrumb-item'><a href="/courses/<%= dept %>">Home</a></li>
+                <li class='breadcrumb-item'><a href="/files/mainfs/<%= dept%>/<%= course%>">Course Page (<%= course%>
+                            )</a></li>
+                <li class='breadcrumb-item active'><a href="#">Upload file to <%= course%></a></li>
+            </ol>
+        </div>
+        <br /><br />
         <div class="row">
             <div class="col-md-6 m-auto">
                 <h1 class="text-center display-4 my-4">Upload Files </h1>
-                <form action="/files/mainfs/<%= dept%>/<%= course%>/uploadfile" method="POST" enctype="multipart/form-data">
+                <form action="/files/mainfs/<%= dept%>/<%= course%>/uploadfile" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle btn-md" type="button" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" name = "filetype">
+                            Select Module
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="#" id='Syllabus'>Syllabus</a>
+                            <a class="dropdown-item" href="#" id='Module1'>Module 1</a>
+                            <a class="dropdown-item" href="#" id='Module2'>Module 2</a>
+                            <a class="dropdown-item" href="#" id='Module3'>Module 3</a>
+                            <a class="dropdown-item" href="#" id='Module4'>Module 4</a>
+                            <a class="dropdown-item" href="#" id='Module5'>Module 5</a>
+                            <a class="dropdown-item" href="#" id='Module6'>Module 6</a>
+                            <a class="dropdown-item" href="#" id='Module7'>Module 7</a>
+                            <a class="dropdown-item" href="#" id='Guest'>Guest Lecture</a>
+                            <a class="dropdown-item" href="#" id='lab'>Lab Files</a>
+                            <a class="dropdown-item" href="#" id='others'>Others</a>
+                        </div>
+                    </div>
+                    <br>
                     <div class="custom-file mb-3 d-grid gap-2">
-                       
 
-                        <input type="file" name="file" id="uploadedfiles"  multiple="multiple"  onchange="FileDetails()"  class="custom-file-input border border-light border-3 text-white ">
+
+                        <input type="file" name="file" id="uploadedfiles" multiple="multiple" onchange="FileDetails()"
+                            class="custom-file-input border border-light border-3 text-white ">
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary" id="submit" name="submit">Submit</button>
@@ -99,9 +124,20 @@
         crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        
-
-
+    <script>
+        $(function () {
+            $(".dropdown-menu").on('click', 'a', function () {
+                $("#dropdownMenuButton").text($(this).text());
+                // $(".btn:first-child").val($(this).text());
+                console.log(document.getElementById("dropdownMenuButton").textContent)
+            });
+        });
+        $("#submit").on('click',function(){
+            $.post("/files/mainfs/<%= dept%>/<%= course%>/uploadfile",{filetype:document.getElementById("dropdownMenuButton").textContent},function(result){
+                
+            });
+        })
+    </script>
 </body>
 
 </html>
