@@ -16,7 +16,7 @@ module.exports = {
             if(req.user.name=='admin')
           return next();
         }
-        req.flash('error_msg', 'You must be admin');
+        req.flash('error_msg', 'You must be admin to Upload/Delete Files');
         res.redirect('back');
       }
 

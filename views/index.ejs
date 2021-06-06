@@ -57,6 +57,46 @@
         <hr>
         <% if(files){ %>
         <% var count=true %>
+        <h1>Syllabus</h1>
+          <% files.map((file)=> { %>
+              <% if(file.isReq) { %>
+                <% if(file.metadata[2]=="Syllabus" || file.metadata[3]=="Syllabus") { %>
+                <% count=false %>
+                <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
+                <%= file.filename %>
+                <div class="row">
+                  <div class="col-6">
+                    <p>Downloads:<%=file.noDown %> </p>
+                  </div>
+                  <div class="col-6">
+                    <div class="star-rating">
+                      <span class="fa fa-star-o" data-rating="1"></span>
+                      <span class="fa fa-star-o" data-rating="2"></span>
+                      <span class="fa fa-star-o" data-rating="3"></span>
+                      <span class="fa fa-star-o" data-rating="4"></span>
+                      <span class="fa fa-star-o" data-rating="5"></span>
+                      <input type="hidden" name="whatever1" class="rating-value" value="2.56">
+                    </div>
+                  </div>
+                </div>
+                  <div class="row align-items-start">
+                    <div class="col-2">
+                      <form method="POST" action="/files/mainfs/download/<%= department%>/<%= course%>/<%= file._id %>">
+                        <button class="btn btn-success btn-block mt-4" id='downloadbtn'>Download</button>
+                      </form>
+                    </div>
+                    <div class="col-2 mr-2" style="margin-left:10px">
+                      <form method="POST"
+                        action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>?_method=DELETE">
+                        <button class="btn btn-danger mt-4">Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                  <br>
+                  <% } %>
+                  <% } %>
+            <% }) %>
         <h1>Module 1</h1>
           <% files.map((file)=> { %>
               <% if(file.isReq) { %>
@@ -212,7 +252,12 @@
                           </form>
                         </div>
                       </div>
-                    </div><h1>Module 5</h1>
+                    </div>
+                    <br>
+                    <% } %>
+                    <% } %>
+              <% }) %>
+                    <h1>Module 5</h1>
                     <% files.map((file)=> { %>
                         <% if(file.isReq) { %>
                           <% if(file.metadata[2]=="Module 5" || file.metadata[3]=="Module 5") { %>
@@ -252,10 +297,6 @@
                             <% } %>
                             <% } %>
                       <% }) %>
-                      <br>
-                      <% } %>
-                      <% } %>
-                <% }) %>
                 <h1>Module 6</h1>
               <% files.map((file)=> { %>
                   <% if(file.isReq) { %>
@@ -336,10 +377,10 @@
                       <% } %>
                       <% } %>
                 <% }) %>
-                <h1>Module 3</h1>
+                <h1>Guest Lecture</h1>
               <% files.map((file)=> { %>
                   <% if(file.isReq) { %>
-                    <% if(file.metadata[2]=="Module 3" || file.metadata[3]=="Module 3") { %>
+                    <% if(file.metadata[2]=="Guest Lecture" || file.metadata[3]=="Guest Lecture") { %>
                     <% count=false %>
                     <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
                     <%= file.filename %>
@@ -375,6 +416,86 @@
                       <br>
                       <% } %>
                       <% } %>
+                      <% }) %>
+                      <h1>Lab Files</h1>
+                      <% files.map((file)=> { %>
+                          <% if(file.isReq) { %>
+                            <% if(file.metadata[2]=="Lab Files" || file.metadata[3]=="Lab Files") { %>
+                            <% count=false %>
+                            <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
+                            <%= file.filename %>
+                            <div class="row">
+                              <div class="col-6">
+                                <p>Downloads:<%=file.noDown %> </p>
+                              </div>
+                              <div class="col-6">
+                                <div class="star-rating">
+                                  <span class="fa fa-star-o" data-rating="1"></span>
+                                  <span class="fa fa-star-o" data-rating="2"></span>
+                                  <span class="fa fa-star-o" data-rating="3"></span>
+                                  <span class="fa fa-star-o" data-rating="4"></span>
+                                  <span class="fa fa-star-o" data-rating="5"></span>
+                                  <input type="hidden" name="whatever1" class="rating-value" value="2.56">
+                                </div>
+                              </div>
+                            </div>
+                              <div class="row align-items-start">
+                                <div class="col-2">
+                                  <form method="POST" action="/files/mainfs/download/<%= department%>/<%= course%>/<%= file._id %>">
+                                    <button class="btn btn-success btn-block mt-4" id='downloadbtn'>Download</button>
+                                  </form>
+                                </div>
+                                <div class="col-2 mr-2" style="margin-left:10px">
+                                  <form method="POST"
+                                    action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>?_method=DELETE">
+                                    <button class="btn btn-danger mt-4">Delete</button>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                              <br>
+                              <% } %>
+                              <% } %>
+                              <% }) %>
+                              <h1>Others</h1>
+                              <% files.map((file)=> { %>
+                                  <% if(file.isReq) { %>
+                                    <% if(file.metadata[2]=="Others" || file.metadata[3]=="Others") { %>
+                                    <% count=false %>
+                                    <div class="card card-body mb-3" style="color: #c8c8c8;background-color: #272b30;border-color: #c8c8c8;">
+                                    <%= file.filename %>
+                                    <div class="row">
+                                      <div class="col-6">
+                                        <p>Downloads:<%=file.noDown %> </p>
+                                      </div>
+                                      <div class="col-6">
+                                        <div class="star-rating">
+                                          <span class="fa fa-star-o" data-rating="1"></span>
+                                          <span class="fa fa-star-o" data-rating="2"></span>
+                                          <span class="fa fa-star-o" data-rating="3"></span>
+                                          <span class="fa fa-star-o" data-rating="4"></span>
+                                          <span class="fa fa-star-o" data-rating="5"></span>
+                                          <input type="hidden" name="whatever1" class="rating-value" value="2.56">
+                                        </div>
+                                      </div>
+                                    </div>
+                                      <div class="row align-items-start">
+                                        <div class="col-2">
+                                          <form method="POST" action="/files/mainfs/download/<%= department%>/<%= course%>/<%= file._id %>">
+                                            <button class="btn btn-success btn-block mt-4" id='downloadbtn'>Download</button>
+                                          </form>
+                                        </div>
+                                        <div class="col-2 mr-2" style="margin-left:10px">
+                                          <form method="POST"
+                                            action="/files/mainfs/<%= department%>/<%= course%>/<%= file._id %>?_method=DELETE">
+                                            <button class="btn btn-danger mt-4">Delete</button>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+                                      <br>
+                                      <% } %>
+                                      <% } %>
                 <% }) %>
 
             <% if(count){ %>
