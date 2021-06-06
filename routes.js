@@ -221,6 +221,9 @@ router.get('/courses/:dept',ensureAuthenticated,(req,res)=>{
   
   //POST request on file submission
   router.post('/files/mainfs/:dept/:course/uploadfile',ensureAuthenticateadmin,(req, res, next) => {
+    var filetype = req.body.filetype;
+    console.log(req.body);
+    coursename.push(filetype);
     updateMetadata(coursename); 
     next();
     res.redirect(`/files/mainfs/${req.params.dept}/${req.params.course}`);
